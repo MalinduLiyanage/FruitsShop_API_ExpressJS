@@ -86,6 +86,7 @@ const deleteUser = (req, res) => {
 
 // Upload User Image
 const uploadUserImage = (req, res) => {
+  const serverUrl = process.env.SERVER_URL || 'http://localhost/';
   const userId = req.params.id;
 
   // Ensure a file is uploaded
@@ -93,8 +94,8 @@ const uploadUserImage = (req, res) => {
     return res.status(400).json({ message: 'No file uploaded' });
   }
 
-  // File path
-  const filePath = path.join('uploads', req.file.filename);
+  // File path with full URL
+  const filePath = new URL(path.join('uploads', req.file.filename), serverUrl).href;
 
   // Update database with the file path
   db.query('UPDATE users SET image_path = ? WHERE id = ?', [filePath, userId], (err, results) => {
@@ -110,6 +111,18 @@ const uploadUserImage = (req, res) => {
   });
 };
 
+const getUserImage = (req, res) => {
+  const filename = req.params.filename;
+  const filePath = path.join(__dirname, 'uploads', filename);
+
+  res.sendFile(filePath, (err) => {
+      if (err) {
+          console.log(err);
+          res.status(404).send('File not found');
+      }
+  });
+}
+
 module.exports = {
   getAllUsers,
   getUserById,
@@ -117,4 +130,5 @@ module.exports = {
   updateUser,
   deleteUser,
   uploadUserImage,
+  getUserImage,
 };
