@@ -1,0 +1,44 @@
+version: "3.8"
+services:
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - app
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+
+  app:
+    build: .
+    container_name: fruit-app
+    restart: always
+    environment:
+      DB_HOST: mysql
+      DB_USER: root
+      DB_PASSWORD: root
+      DB_NAME: fruits_db
+    depends_on:
+      - mysql
+    volumes:
+      - ./uploads:/usr/src/app/uploads
+
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: fruits_db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: user
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./config/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+volumes:
+  mysql_data:
