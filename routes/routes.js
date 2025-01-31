@@ -1,15 +1,22 @@
 const express = require('express');
 const multer = require('multer');
+const authenticateToken = require('../config/tokenmanager');
 const app = express();
 app.use(express.json());
 const {
+  signupUser,
+  loginUser,
   getAllUsers,
   getUserById,
   addUser,
   updateUser,
   deleteUser,
-  uploadUserImage,
+  uploadUserImage
 } = require('../controllers/userController');
+const {
+  getAllFruits,
+  getFruitById,
+} = require('../controllers/fruitsController');
 
 const router = express.Router();
 
@@ -25,13 +32,20 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// Define API endpoints
-router.get('/users', getAllUsers); //GET http://localhost:3000/api/users/
-router.get('/users/:id', getUserById); //GET http://localhost:3000/api/users/1
-router.post('/users', addUser);  //POST http://localhost:3000/api/users/ {"name": "Alice","email": "alice@example.com"}
-router.put('/users/:id', updateUser); //PUT http://localhost:3000/api/users/1 {"name": "Aliceupdated","email": "aliceupdated@example.com"}
-router.delete('/users/:id', deleteUser); //DELETE http://localhost:3000/api/users/1
-router.post('/users/:id/upload', upload.single('image'), uploadUserImage);
+//Signup and Login
+router.post('/signup', signupUser);
+router.post('/login', loginUser);
+
+// Define API endpoints for users
+router.get('/users',authenticateToken, getAllUsers); //GET http://localhost:3000/api/users/
+router.get('/users/:id',authenticateToken, getUserById); //GET http://localhost:3000/api/users/1
+router.post('/users',authenticateToken, addUser);  //POST http://localhost:3000/api/users/ {"name": "Alice","email": "alice@example.com"}
+router.put('/users/:id',authenticateToken,  updateUser); //PUT http://localhost:3000/api/users/1 {"name": "Aliceupdated","email": "aliceupdated@example.com"}
+router.delete('/users/:id',authenticateToken,  deleteUser); //DELETE http://localhost:3000/api/users/1
+router.post('/users/:id/upload', upload.single('image'),authenticateToken, uploadUserImage);
+
+// Define API endpoints for fruits
+router.get('/fruits',authenticateToken, getAllFruits); //GET http://localhost:3000/api/fruits/
+router.get('/fruits/:id',authenticateToken, getFruitById); //GET http://localhost:3000/api/fruits/1
 
 module.exports = router;
-

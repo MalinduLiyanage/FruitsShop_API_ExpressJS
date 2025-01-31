@@ -1,5 +1,52 @@
 const db = require('../config/db');
 const path = require('path');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+
+// Signup User
+const signupUser = async (req, res) => {
+  const { name, email, password } = req.body;
+
+  if (!name || !email || !password) {
+    return res.status(400).json({ error: 'All fields are required' });
+  }
+
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10); 
+
+    db.query('INSERT INTO users (name, email, password) VALUES (?, ?, ?)', 
+      [name, email, hashedPassword], 
+      (err, results) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.status(201).json({ message: 'User registered', userId: results.insertId });
+    });
+
+  } catch (error) {
+    res.status(500).json({ error: 'Error hashing password' });
+  }
+};
+
+// Login User
+const loginUser = (req, res) => {
+  const { email, password } = req.body;
+
+  db.query('SELECT * FROM users WHERE email = ?', [email], async (err, results) => {
+    if (err) return res.status(500).json({ error: err.message });
+
+    if (results.length === 0) return res.status(401).json({ error: 'Invalid credentials' });
+
+    const user = results[0];
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return res.status(401).json({ error: 'Invalid credentials' });
+
+    const token = jwt.sign({ userId: user.id, email: user.email }, process.env.JWT_SECRET, {
+      expiresIn: '1h'
+    });
+
+    res.json({ message: 'Login successful', token });
+  });
+};
 
 // Get All Users
 const getAllUsers = (req, res) => {
@@ -25,29 +72,6 @@ const getUserById = (req, res) => {
       return;
     }
     res.json(results[0]);
-  });
-};
-
-// Add a New User
-const addUser = (req, res) => {
-  //const { name, email } = req.body;
-  const name = req.body.name;
-  const email = req.body.email;
-  console.log('Request Body:', req.body);
-
-
-  // Validate input
-  if (!name || !email) {
-    res.status(400).json({ error: 'Name and email are required.' });
-    return;
-  }
-
-  db.query('INSERT INTO users (name, email) VALUES (?, ?)', [name, email], (err, results) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
-    }
-    res.status(201).json({ message: 'User added', userId: results.insertId });
   });
 };
 
@@ -124,11 +148,13 @@ const getUserImage = (req, res) => {
 }
 
 module.exports = {
+  signupUser,
+  loginUser,
   getAllUsers,
   getUserById,
   addUser,
   updateUser,
   deleteUser,
   uploadUserImage,
-  getUserImage,
+  getUserImage
 };
