@@ -50,7 +50,7 @@ const loginUser = (req, res) => {
 
 // Get All Users
 const getAllUsers = (req, res) => {
-  db.query('SELECT * FROM users', (err, results) => {
+  db.query('SELECT name, email, image_path FROM users', (err, results) => {
     if (err) {
       res.status(500).json({ error: err.message });
       return;
@@ -59,81 +59,104 @@ const getAllUsers = (req, res) => {
   });
 };
 
-// Get User by ID
+// Get User by ID (only for the logged-in user)
 const getUserById = (req, res) => {
-  const userId = req.params.id;
-  db.query('SELECT * FROM users WHERE id = ?', [userId], (err, results) => {
+  const requestedUserId = req.params.id;
+  const authenticatedUserId = req.user.userId; // Get userId from JWT
+
+  if (requestedUserId !== authenticatedUserId.toString()) {
+    return res.status(403).json({ error: 'Forbidden: You can only access your own data' });
+  }
+
+  db.query('SELECT * FROM users WHERE id = ?', [requestedUserId], (err, results) => {
     if (err) {
-      res.status(500).json({ error: err.message });
-      return;
+      return res.status(500).json({ error: err.message });
     }
+
     if (results.length === 0) {
-      res.status(404).json({ message: 'User not found' });
-      return;
+      return res.status(404).json({ message: 'User not found' });
     }
+
     res.json(results[0]);
   });
 };
 
-// Update a User
+
+
 const updateUser = (req, res) => {
-  const userId = req.params.id;
+  const requestedUserId = req.params.id; 
+  const authenticatedUserId = req.user.userId; 
+
+  if (requestedUserId !== authenticatedUserId.toString()) {
+    return res.status(403).json({ error: 'Forbidden: You can only update your own data' });
+  }
+
   const { name, email } = req.body;
-  db.query('UPDATE users SET name = ?, email = ? WHERE id = ?', [name, email, userId], (err, results) => {
+
+  db.query('UPDATE users SET name = ?, email = ? WHERE id = ?', [name, email, requestedUserId], (err, results) => {
     if (err) {
-      res.status(500).json({ error: err.message });
-      return;
+      return res.status(500).json({ error: err.message });
     }
+
     if (results.affectedRows === 0) {
-      res.status(404).json({ message: 'User not found' });
-      return;
+      return res.status(404).json({ message: 'User not found' });
     }
+
     res.json({ message: 'User updated' });
   });
 };
 
+
 // Delete a User
 const deleteUser = (req, res) => {
-  const userId = req.params.id;
-  db.query('DELETE FROM users WHERE id = ?', [userId], (err, results) => {
+  const requestedUserId = req.params.id; 
+  const authenticatedUserId = req.user.userId; 
+
+  if (requestedUserId !== authenticatedUserId.toString()) {
+    return res.status(403).json({ error: 'Forbidden: You can only delete your own account' });
+  }
+
+  db.query('DELETE FROM users WHERE id = ?', [requestedUserId], (err, results) => {
     if (err) {
-      res.status(500).json({ error: err.message });
-      return;
+      return res.status(500).json({ error: err.message });
     }
+
     if (results.affectedRows === 0) {
-      res.status(404).json({ message: 'User not found' });
-      return;
+      return res.status(404).json({ message: 'User not found' });
     }
+
     res.json({ message: 'User deleted' });
   });
 };
 
-// Upload User Image
-const uploadUserImage = (req, res) => {
-  const serverUrl = process.env.SERVER_URL || 'http://localhost/';
-  const userId = req.params.id;
 
-  // Ensure a file is uploaded
+const uploadUserImage = (req, res) => {
+  const requestedUserId = req.params.id; 
+  const authenticatedUserId = req.user.userId; 
+
+  if (requestedUserId !== authenticatedUserId.toString()) {
+    return res.status(403).json({ error: 'Forbidden: You can only upload an image for your own account' });
+  }
+
   if (!req.file) {
     return res.status(400).json({ message: 'No file uploaded' });
   }
 
-  // File path with full URL
+  const serverUrl = process.env.SERVER_URL;
+
   const filePath = new URL(path.join('uploads', req.file.filename), serverUrl).href;
 
-  // Update database with the file path
-  db.query('UPDATE users SET image_path = ? WHERE id = ?', [filePath, userId], (err, results) => {
+  db.query('UPDATE users SET image_path = ? WHERE id = ?', [filePath, requestedUserId], (err, results) => {
     if (err) {
-      res.status(500).json({ error: err.message });
-      return;
+      return res.status(500).json({ error: err.message });
     }
     if (results.affectedRows === 0) {
-      res.status(404).json({ message: 'User not found' });
-      return;
+      return res.status(404).json({ message: 'User not found' });
     }
     res.json({ message: 'Image uploaded successfully', filePath });
   });
 };
+
 
 const getUserImage = (req, res) => {
   const filename = req.params.filename;
@@ -152,7 +175,6 @@ module.exports = {
   loginUser,
   getAllUsers,
   getUserById,
-  addUser,
   updateUser,
   deleteUser,
   uploadUserImage,

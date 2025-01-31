@@ -7,6 +7,10 @@ const authenticateToken = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token.replace("Bearer ", ""), process.env.JWT_SECRET);
+
+    // Log decoded to ensure it has userId
+    console.log(decoded);
+
     req.user = decoded;
     next();
   } catch (err) {

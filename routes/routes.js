@@ -8,7 +8,6 @@ const {
   loginUser,
   getAllUsers,
   getUserById,
-  addUser,
   updateUser,
   deleteUser,
   uploadUserImage
@@ -39,7 +38,6 @@ router.post('/login', loginUser);
 // Define API endpoints for users
 router.get('/users',authenticateToken, getAllUsers); //GET http://localhost:3000/api/users/
 router.get('/users/:id',authenticateToken, getUserById); //GET http://localhost:3000/api/users/1
-router.post('/users',authenticateToken, addUser);  //POST http://localhost:3000/api/users/ {"name": "Alice","email": "alice@example.com"}
 router.put('/users/:id',authenticateToken,  updateUser); //PUT http://localhost:3000/api/users/1 {"name": "Aliceupdated","email": "aliceupdated@example.com"}
 router.delete('/users/:id',authenticateToken,  deleteUser); //DELETE http://localhost:3000/api/users/1
 router.post('/users/:id/upload', upload.single('image'),authenticateToken, uploadUserImage);
