@@ -15,8 +15,8 @@ This is a simple Express.js backend with authentication (JWT) and MySQL integrat
 
 1. **Clone the Repository**  
    ```sh
-   git clone https://github.com/your-repo-name.git
-   cd your-repo-name
+   git clone https://github.com/MalinduLiyanage/FruitsShop_API_ExpressJS.git
+   cd FruitsShop_API_ExpressJS
    ```
 2. **Build and Run with Docker**  
    ```
@@ -25,14 +25,14 @@ This is a simple Express.js backend with authentication (JWT) and MySQL integrat
 3. **Access the API** 
 The server is running on
    ```
-   http://localhost/
+   http://localhost
    ```
 
 ## 📌 API Endpoints
 
 1. **Signup for an user Account**
 ```
-POST /signup
+POST /api/signup
 ```
 Request Body
    ```
@@ -47,5 +47,24 @@ Sample Response
    {
     "message": "User registered",
     "userId": 14
+    }
+   ``` 
+
+2. **Login to an user Account**
+```
+POST /api/login
+```
+Request Body
+   ```
+   {
+  "email": "malindu@gmail.com",
+  "password": "password"
+   }
+   ```
+Sample Response
+   ```
+   {
+    "message": "Login successful",
+    "token": <JWT Token>
     }
    ``` 
