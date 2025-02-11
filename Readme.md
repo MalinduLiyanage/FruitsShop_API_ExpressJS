@@ -97,13 +97,13 @@ Request Headers
 Sample Response
    ```
    {
-    "id": 14,
+    "id": 1,
     "name": "Malindu",
     "email": "malindu@gmail.com",
     "password": "jfruihf47rjfuwyd84ir04t-o54gjireg854t05ig9hefki954",
     "image_path": null
    }
-   ``` 
+   ```  
 
 5. **Update Loggedin User Info**
 This request is only working for the logged in user. Other user info cannot be updated.
