@@ -32,18 +32,18 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 //Signup and Login
-router.post('/signup', signupUser);
-router.post('/login', loginUser);
+router.post('/signup', signupUser); //JSON body {"name": "Malindu","email": "malindu@gmail.com","password": "password"}
+router.post('/login', loginUser); // JSON Body {"email": "malindu@gmail.com","password": "password"} Response with token
 
-// Define API endpoints for users
-router.get('/users',authenticateToken, getAllUsers); //GET http://localhost:3000/api/users/
-router.get('/users/:id',authenticateToken, getUserById); //GET http://localhost:3000/api/users/1
-router.put('/users/:id',authenticateToken,  updateUser); //PUT http://localhost:3000/api/users/1 {"name": "Aliceupdated","email": "aliceupdated@example.com"}
-router.delete('/users/:id',authenticateToken,  deleteUser); //DELETE http://localhost:3000/api/users/1
-router.post('/users/:id/upload', upload.single('image'),authenticateToken, uploadUserImage);
+// Define API endpoints for users (Put the Authorization Header like Bearer + JWT)
+router.get('/users',authenticateToken, getAllUsers); //GET http://localhost/api/users/
+router.get('/users/:id',authenticateToken, getUserById); //GET http://localhost/api/users/1
+router.put('/users/:id',authenticateToken,  updateUser); //PUT http://localhost/api/users/1 {"name": "Aliceupdated","email": "aliceupdated@example.com"}
+router.delete('/users/:id',authenticateToken,  deleteUser); //DELETE http://localhost/api/users/1
+router.post('/users/:id/upload', upload.single('image'),authenticateToken, uploadUserImage); //POST http://localhost/api/users/12/upload
 
-// Define API endpoints for fruits
-router.get('/fruits',authenticateToken, getAllFruits); //GET http://localhost:3000/api/fruits/
-router.get('/fruits/:id',authenticateToken, getFruitById); //GET http://localhost:3000/api/fruits/1
+// Define API endpoints for fruits (Put the Authorization Header like Bearer + JWT)
+router.get('/fruits',authenticateToken, getAllFruits); //GET http://localhost/api/fruits/
+router.get('/fruits/:id',authenticateToken, getFruitById); //GET http://localhost/api/fruits/1
 
 module.exports = router;
