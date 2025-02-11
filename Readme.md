@@ -28,7 +28,7 @@ The server is running on
    http://localhost
    ```
 
-## 📌 API Endpoints
+## 📌 API Endpoints for the User
 
 1. **Signup for an user Account**
 ```
@@ -47,7 +47,7 @@ Sample Response
    {
     "message": "User registered",
     "userId": 14
-    }
+   }
    ``` 
 
 2. **Login to an user Account**
@@ -66,5 +66,114 @@ Sample Response
    {
     "message": "Login successful",
     "token": <JWT Token>
-    }
+   }
    ``` 
+3. **Get Users List**
+```
+GET /api/users
+```
+Request Headers
+   ```
+   Authorization : Bearer <JWT Token>
+   ```
+Sample Response
+   ```
+   {
+        "name": "John Doe",
+        "email": "john.doe@example.com",
+        "image_path": "https://cdn-icons-png.flaticon.com/512/9187/9187604.png"
+   },...
+   ``` 
+
+4. **Get Loggedin User Info**
+This request is only working for the logged in user. Other user info cannot be obtained.
+```
+GET /api/users/<user_id>
+```
+Request Headers
+   ```
+   Authorization : Bearer <JWT Token>
+   ```
+Sample Response
+   ```
+   {
+    "id": 14,
+    "name": "Malindu",
+    "email": "malindu@gmail.com",
+    "password": "jfruihf47rjfuwyd84ir04t-o54gjireg854t05ig9hefki954",
+    "image_path": null
+   }
+   ``` 
+
+5. **Update Loggedin User Info**
+This request is only working for the logged in user. Other user info cannot be updated.
+```
+PUT /api/users/<user_id>
+```
+Request Headers
+   ```
+   Authorization : Bearer <JWT Token>
+   ```
+Request Body
+   ```
+   {
+  "email": "malinduupdated@gmail.com",
+  "password": "passwordupdated"
+   }
+   ```
+
+6. **Delete Loggedin User Info**
+This request is only working for the logged in user. Other user info cannot be deleted.
+```
+DELETE /api/users/<user_id>
+```
+Request Headers
+   ```
+   Authorization : Bearer <JWT Token>
+   ```
+
+7. **Update Loggedin User Profile Picture**
+This request is only working for the logged in user. Other user info cannot be updated.
+```
+POST /api/users/<user_id>/upload
+```
+Request Headers
+   ```
+   Authorization : Bearer <JWT Token>
+   ```
+Request Body (form-data)
+   ```
+   Key : image 
+   Key Type : File
+   Value : <sample.jpg>
+   ```
+
+## 📌 API Endpoints for Products
+
+1. **Get all Fruits list**
+```
+GET /api/fruits
+```
+Request Headers
+   ```
+   Authorization : Bearer <JWT Token>
+   ```
+
+2. **Get a Single Fruit info**
+```
+GET /api/fruits/<fruit_id>
+```
+Request Headers
+   ```
+   Authorization : Bearer <JWT Token>
+   ```
+
+
+## 📌 API Endpoints for the HomePage
+   ```
+   http://localhost/
+   ```
+
+
+
+
